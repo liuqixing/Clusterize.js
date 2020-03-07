@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Demo</title>
+
+	<link href="./clusterize.css" rel="stylesheet">
+	<script src="./clusterize.js"></script>
+
+</head>
+<body>
+
+<!--HTML-->
+<div class="clusterize">
+	<table>
+		<thead>
+		<tr>
+			<th>Headers</th>
+		</tr>
+		</thead>
+	</table>
+	<div id="scrollArea" class="clusterize-scroll" style="border: 1px solid red; width: 500px;">
+		<table>
+			<tbody id="contentArea" class="clusterize-content">
+<!--			<tr class="clusterize-extra-row clusterize-keep-parity"></tr>-->
+<!--			<tr class="clusterize-extra-row clusterize-top-space" style="height:12345px;"></tr>-->
+
+<!--			&lt;!&ndash;tr>Your (rows_in_block * blocks_in_cluster) rows</tr&ndash;&gt;-->
+
+<!--			<tr class="clusterize-extra-row clusterize-bottom-space" style="height:12345px;"></tr>-->
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+	// JavaScript
+	let arrData = [];
+	for ( let i = 0; i < 10000; i ++ )
+	{
+		arrData.push( '<tr><td>' + i + '</td></tr>' );
+	}
+	let clusterize = new Clusterize
+	({
+		rows : arrData,
+		scrollId: 'scrollArea',
+		contentId: 'contentArea'
+	});
+
+</script>
+
+</body>
+</html>

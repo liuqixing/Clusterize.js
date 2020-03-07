@@ -1,0 +1,40 @@
+section {
+	position: relative;
+	text-align: center;
+	height: 80vh;
+}
+
+.red {
+	background: #FF4136;
+}
+.green {
+	background: #2ECC40;
+}
+.blue {
+	background: #0074D9;
+}
+.orange {
+	background: rebeccapurple;
+}
+
+h1 {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 100%;
+
+	font-size: 5vw;
+	color: #fff;
+	text-transform: uppercase;
+}
+
+body {
+	font-family: "Avenir Next", Montserrat, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 100%;
+}
+
+::scrollbar {
+	display: none;
+}

@@ -53,10 +53,32 @@ class ClusterizeUtil
 		return window.getComputedStyle ? window.getComputedStyle( elem )[ prop ] : elem.currentStyle[ prop ];
 	}
 
+	static isNumber( vValue )
+	{
+		return 'number' === typeof vValue;
+	}
+
+	static isString( vValue )
+	{
+		return 'string' === typeof vValue;
+	}
+
+	static isObject( vValue )
+	{
+		const sType = typeof vValue;
+		return null !== vValue && ( 'object' === sType || 'function' === sType );
+	}
 }
 
 
 /**
  *	@type {ClusterizeUtil}
  */
-module.exports	= ClusterizeUtil;
+if ( 'undefined' !== typeof module )
+{
+	module.exports = ClusterizeUtil;
+}
+else
+{
+	exports = ClusterizeUtil;
+}

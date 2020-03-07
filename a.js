@@ -5,4 +5,11 @@ class A {
 	}
 }
 
-module.exports	= A;
+if ( 'undefined' !== typeof module )
+{
+	module.exports	= A;
+}
+else
+{
+	exports	= A;
+}
