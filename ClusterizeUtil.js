@@ -3,27 +3,6 @@
  */
 class ClusterizeUtil
 {
-	//
-	//	detect ie9 and lower
-	//	https://gist.github.com/padolsey/527683#comment-786682
-	//
-	static getIeVersion()
-	{
-		let v	= 0;
-		let el	= null;
-		let all	= null;
-
-		for ( v = 3,
-			el = document.createElement('b'),
-			all = el.all || [];
-			el.innerHTML = '<!--[if gt IE ' + ( ++v ) + ']><i><![endif]-->',
-			all[ 0 ];
-		)
-		{
-		}
-		return v > 4 ? v : document.documentMode;
-	}
-
 	static isMac()
 	{
 		return -1 !== navigator.platform.toLowerCase().indexOf( 'mac' );

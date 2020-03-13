@@ -1,53 +1,8 @@
-/**
- * 	@class	ClusterizeUtil
- */
-class ClusterizeUtil
+if ( 'undefined' !== typeof require )
 {
-	static isMac()
-	{
-		return -1 !== navigator.platform.toLowerCase().indexOf( 'mac' );
-	}
-
-
-	//
-	//	support functions
-	//
-	static on( evt, element, fnc )
-	{
-		return element.addEventListener ? element.addEventListener( evt, fnc, false ) : element.attachEvent( "on" + evt, fnc );
-	}
-
-	static off( evt, element, fnc )
-	{
-		return element.removeEventListener ? element.removeEventListener( evt, fnc, false ) : element.detachEvent( "on" + evt, fnc );
-	}
-
-	static isArray( arr )
-	{
-		return '[object Array]' === Object.prototype.toString.call( arr );
-	}
-
-	static getStyle( prop, elem )
-	{
-		return window.getComputedStyle ? window.getComputedStyle( elem )[ prop ] : elem.currentStyle[ prop ];
-	}
-
-	static isNumber( vValue )
-	{
-		return 'number' === typeof vValue;
-	}
-
-	static isString( vValue )
-	{
-		return 'string' === typeof vValue;
-	}
-
-	static isObject( vValue )
-	{
-		const sType = typeof vValue;
-		return null !== vValue && ( 'object' === sType || 'function' === sType );
-	}
+	const ClusterizeUtil	= require( './ClusterizeUtil' );
 }
+
 
 /**
  *	Clusterize.js - v0.18.1 - 2018-01-02
@@ -63,18 +18,18 @@ class Clusterize
 			! ClusterizeUtil.isString( oParameter.scrollId ) ||
 			! ClusterizeUtil.isString( oParameter.contentId ) )
 		{
-			throw new Error( `constructor with invalid oData` );
+			throw new Error( `Clusterize.constructor.invalid.oData` );
 		}
 
 		this.scrollElem		= document.getElementById( oParameter.scrollId );
 		this.contentElem	= document.getElementById( oParameter.contentId );
 		if ( 'undefined' === typeof this.scrollElem || ! this.scrollElem )
 		{
-			throw new Error( `Error! Could not find scroll_elem by id : ${ oParameter.scrollId }` );
+			throw new Error( `Clusterize.constructor.failed.find.scroll_elem.by.id:${ oParameter.scrollId }` );
 		}
 		if ( 'undefined' === typeof this.contentElem || ! this.contentElem )
 		{
-			throw new Error( `Error! Could not find content_elem by id : ${ oParameter.contentId }` );
+			throw new Error( `Clusterize.constructor.failed.find.content_elem.by.id:${ oParameter.contentId }` );
 		}
 
 		//	public parameters
@@ -103,16 +58,16 @@ class Clusterize
 		let nScrollTop	= this.scrollElem.scrollTop;
 
 		//	append initial data
-		this.insertToDOM( this.arrRows, this.oCache );
+		this.insertToDOM();
 
 		//	restore the scroll position
-		this.scrollElem.scrollTop = nScrollTop;
+		this.scrollElem.scrollTop	= nScrollTop;
 
 		//	adding scroll handler
 		this.bInitLastCluster		= false;
 		this.nInitTimerScrollDebounce	= 0;
 		this.bInitPointerEventsSet	= false;
-		this.nInitTimerResizeDebounce = 0;
+		this.nInitTimerResizeDebounce	= 0;
 
 		//
 		//	set event listeners
@@ -148,7 +103,7 @@ class Clusterize
 
 		if ( this.bInitLastCluster !== ( this.bInitLastCluster = this.getClusterNum() ) )
 		{
-			this.insertToDOM( this.arrRows, this.oCache );
+			this.insertToDOM();
 		}
 		if ( this.options.callbacks.scrollingProgress )
 		{
@@ -189,7 +144,9 @@ class Clusterize
 			this.scrollElem.scrollTop = 0;
 			this.bInitLastCluster = false;
 		}
-		this.insertToDOM( this.arrRows, this.oCache );
+
+		//	...
+		this.insertToDOM();
 		this.scrollElem.scrollTop = nScrollTop;
 	}
 
@@ -219,7 +176,7 @@ class Clusterize
 		this.arrRows = 'append' === sWhere
 			? this.arrRows.concat( arrNewRows )
 			: arrNewRows.concat( this.arrRows );
-		this.insertToDOM( this.arrRows, this.oCache );
+		this.insertToDOM();
 	}
 
 	append( arrRows )
@@ -250,18 +207,18 @@ class Clusterize
 	}
 
 	//	get tag name, content tag name, tag height, calc cluster height
-	exploreEnvironment( arrRows, oCache )
+	exploreEnvironment()
 	{
 		this.options.content_tag = this.contentElem.tagName.toLowerCase();
 
-		if ( arrRows.length < 1 )
+		if ( this.arrRows.length < 1 )
 		{
 			return;
 		}
 
 		if ( this.contentElem.children.length <= 1 )
 		{
-			oCache.data = this.html( arrRows[ 0 ] + arrRows[ 0 ] + arrRows[ 0 ] );
+			this.oCache.data = this.html( this.arrRows[ 0 ] + this.arrRows[ 0 ] + this.arrRows[ 0 ] );
 		}
 		if ( ! this.options.tag )
 		{
@@ -269,17 +226,17 @@ class Clusterize
 		}
 
 		//	...
-		this.getRowsHeight( arrRows );
+		this.getRowsHeight();
 	}
 
 	//	calculate the height of rows
-	getRowsHeight( arrRows )
+	getRowsHeight()
 	{
 		let nPrevItemHeight	= this.options.item_height;
 
 		//	...
 		this.options.cluster_height	= 0;
-		if ( ! ClusterizeUtil.isArray( arrRows ) || ! arrRows.length )
+		if ( ! ClusterizeUtil.isArray( this.arrRows ) || 0 === this.arrRows.length )
 		{
 			return;
 		}
@@ -356,48 +313,59 @@ class Clusterize
 	//	generate empty row if no data provided
 	generateEmptyRow()
 	{
-		let opts = this.options;
-		if ( ! opts.tag || ! opts.show_no_data_row )
+		if ( ! this.options.tag || ! this.options.show_no_data_row )
 		{
 			return [];
 		}
 
-		let empty_row = document.createElement( opts.tag );
-		let no_data_content = document.createTextNode( opts.no_data_text );
-		let td;
-
-		empty_row.className = opts.no_data_class;
-		if ( opts.tag === 'tr' )
+		let oEmptyRow = document.createElement( this.options.tag );
+		if ( ! oEmptyRow )
 		{
-			td = document.createElement( 'td' );
+			return [];
+		}
 
-			//	fixes #53
-			td.colSpan	= 100;
-			td.appendChild( no_data_content );
+		let oNoDataContent = document.createTextNode( this.options.no_data_text );
+		if ( ! oNoDataContent )
+		{
+			return [];
 		}
 
 		//	...
-		empty_row.appendChild( td || no_data_content );
-		return [ empty_row.outerHTML ];
+		let oTd;
+
+		//	...
+		oEmptyRow.className = this.options.no_data_class;
+		if ( 'tr' === this.options.tag )
+		{
+			oTd = document.createElement( 'td' );
+
+			//	fixes #53
+			oTd.colSpan = 100;
+			oTd.appendChild( oNoDataContent );
+		}
+
+		//	...
+		oEmptyRow.appendChild( oTd || oNoDataContent );
+		return [ oEmptyRow.outerHTML ];
 	}
 
 	//	generate cluster for current scroll position
-	generate( arrRows, nClusterNum )
+	generate( nClusterNum )
 	{
-		if ( ! Array.isArray( arrRows ) )
+		if ( ! Array.isArray( this.arrRows ) )
 		{
-			throw new Error( `generate with invalid arrRows.` );
+			throw new Error( `Clusterize.generate.invalid.arrRows` );
 		}
 		if ( ! ClusterizeUtil.isNumber( nClusterNum ) )
 		{
-			throw new Error( `generate with invalid nClusterNum.` );
+			throw new Error( `Clusterize.generate.invalid.nClusterNum` );
 		}
 
 		//	...
-		let nRowsLen = arrRows.length;
+		let nRowsLen = this.arrRows.length;
 		if ( nRowsLen < this.options.rows_in_block )
 		{
-			const arrNewRows = nRowsLen > 0 ? arrRows : this.generateEmptyRow();
+			const arrNewRows = nRowsLen > 0 ? this.arrRows : this.generateEmptyRow();
 			console.log( `###### Clusterize.generate ${ arrNewRows.length } rows since rows < this.options.rows_in_block=${ this.options.rows_in_block }` );
 			return {
 				top_offset : 0,
@@ -410,8 +378,8 @@ class Clusterize
 		let nItemsStart		= Math.max( ( this.options.rows_in_cluster - this.options.rows_in_block ) * nClusterNum, 0 );
 		let nItemsEnd		= nItemsStart + this.options.rows_in_cluster;
 
-		let nTopOffset		= Math.max(nItemsStart * this.options.item_height, 0);
-		let nBottomOffset	= Math.max(( nRowsLen - nItemsEnd ) * this.options.item_height, 0 );
+		let nTopOffset		= Math.max( nItemsStart * this.options.item_height, 0 );
+		let nBottomOffset	= Math.max( ( nRowsLen - nItemsEnd ) * this.options.item_height, 0 );
 		let arrThisClusterRows	= [];
 		let nRowsAbove		= nItemsStart;
 		if ( nTopOffset < 1 )
@@ -420,7 +388,7 @@ class Clusterize
 		}
 		for ( let i = nItemsStart; i < nItemsEnd; i++ )
 		{
-			arrRows[ i ] && arrThisClusterRows.push( arrRows[ i ] );
+			this.arrRows[ i ] && arrThisClusterRows.push( this.arrRows[ i ] );
 		}
 
 		console.log( `###### Clusterize.generate ${ arrThisClusterRows.length } rows normally!` );
@@ -436,7 +404,7 @@ class Clusterize
 	{
 		if ( ! ClusterizeUtil.isString( sClassName ) )
 		{
-			throw new Error( `renderExtraTag with invalid sClassName.` );
+			throw new Error( `Clusterize.renderExtraTag.invalid.sClassName` );
 		}
 
 		//	...
@@ -455,102 +423,107 @@ class Clusterize
 	}
 
 	//	if necessary verify data changed and insert to DOM
-	insertToDOM( arrRows, oCache )
+	insertToDOM()
 	{
-		if ( ! ClusterizeUtil.isArray( arrRows ) )
+		if ( ! ClusterizeUtil.isArray( this.arrRows ) )
 		{
-			throw new Error( `insertToDOM with invalid arrRows.` );
+			throw new Error( `Clusterize.insertToDOM.invalid.arrRows` );
 		}
-		if ( ! ClusterizeUtil.isObject( oCache ) )
+		if ( ! ClusterizeUtil.isObject( this.oCache ) )
 		{
-			throw new Error( `insertToDOM with invalid oCache.` );
+			throw new Error( `Clusterize.insertToDOM.invalid.oCache` );
 		}
 
 		//	explore row's height
 		if ( ! this.options.cluster_height )
 		{
-			this.exploreEnvironment( arrRows, oCache );
+			this.exploreEnvironment();
 		}
 
-		let data				= this.generate( arrRows, this.getClusterNum() );
-		let this_cluster_rows			= data.rows.join( '' );
-		let this_cluster_content_changed	= this.checkChanges( 'data', this_cluster_rows, oCache );
-		let top_offset_changed			= this.checkChanges( 'top', data.top_offset, oCache );
-		let only_bottom_offset_changed		= this.checkChanges( 'bottom', data.bottom_offset, oCache );
+		//	...
+		let oGeneratedData			= this.generate( this.getClusterNum() );
+		let this_cluster_rows			= oGeneratedData.rows.join( '' );
+		let this_cluster_content_changed	= this.checkChanges( 'data', this_cluster_rows );
+		let top_offset_changed			= this.checkChanges( 'top', oGeneratedData.top_offset );
+		let only_bottom_offset_changed		= this.checkChanges( 'bottom', oGeneratedData.bottom_offset );
 		let callbacks				= this.options.callbacks;
 		let layout				= [];
 
 		if ( this_cluster_content_changed || top_offset_changed )
 		{
-			if ( data.top_offset )
+			if ( oGeneratedData.top_offset )
 			{
 				this.options.keep_parity && layout.push( this.renderExtraTag( 'keep-parity' ) );
-				layout.push( this.renderExtraTag( 'top-space', data.top_offset ) );
+				layout.push( this.renderExtraTag( 'top-space', oGeneratedData.top_offset ) );
 			}
 
 			layout.push( this_cluster_rows );
-			data.bottom_offset && layout.push( this.renderExtraTag( 'bottom-space', data.bottom_offset ) );
+			oGeneratedData.bottom_offset && layout.push( this.renderExtraTag( 'bottom-space', oGeneratedData.bottom_offset ) );
 			callbacks.clusterWillChange && callbacks.clusterWillChange();
 			this.html( layout.join( '' ) );
-			this.options.content_tag === 'ol' && this.contentElem.setAttribute( 'start', data.rows_above );
-			this.contentElem.style[ 'counter-increment' ] = 'clusterize-counter ' + ( data.rows_above - 1 );
+			this.options.content_tag === 'ol' && this.contentElem.setAttribute( 'start', oGeneratedData.rows_above );
+			this.contentElem.style[ 'counter-increment' ] = 'clusterize-counter ' + ( oGeneratedData.rows_above - 1 );
 			callbacks.clusterChanged && callbacks.clusterChanged();
 		}
 		else if ( only_bottom_offset_changed )
 		{
-			this.contentElem.lastChild.style.height = data.bottom_offset + 'px';
+			this.contentElem.lastChild.style.height = oGeneratedData.bottom_offset + 'px';
 		}
 	}
 
-	//	unfortunately ie <= 9 does not allow to use innerHTML for table elements, so make a workaround
 	html( sData )
 	{
 		if ( ! ClusterizeUtil.isString( sData ) )
 		{
-			throw new Error( `getChildNodes with invalid sData.` );
+			throw new Error( `Clusterize.html.invalid.sData` );
 		}
 
-		//	...
+		//
+		//	unfortunately ie <= 9 does not allow to use innerHTML for table elements,
+		//	so do not support it
+		//
 		this.contentElem.innerHTML = sData;
 	}
 
-	getChildNodes( oTag )
+	getChildNodes( oTagContainer )
 	{
-		if ( ! oTag )
+		if ( ! oTagContainer )
 		{
-			throw new Error( `getChildNodes with invalid oTag.` );
+			throw new Error( `Clusterize.getChildNodes.invalid.oTagContainer` );
 		}
 
-		let child_nodes = oTag.children;
-		let nodes = [];
-		for ( let i = 0, ii = child_nodes.length; i < ii; i++ )
+		//	convert oTagContainer.children object to Array
+		let arrNodes	= [];
+		let nLen	= oTagContainer.children.length;
+		for ( let i = 0; i < nLen; i++ )
 		{
-			nodes.push( child_nodes[ i ] );
+			arrNodes.push( oTagContainer.children[ i ] );
 		}
 
-		//	...
-		return nodes;
+		return arrNodes;
 	}
 
-	checkChanges( sType, value, oCache )
+	checkChanges( sType, vValue )
 	{
 		if ( ! ClusterizeUtil.isString( sType ) )
 		{
-			throw new Error( `checkChanges with invalid sType.` );
+			throw new Error( `Clusterize.checkChanges.invalid.sType` );
 		}
-		if ( ! ClusterizeUtil.isObject( oCache ) )
+		if ( ! ClusterizeUtil.isObject( this.oCache ) )
 		{
-			throw new Error( `checkChanges with invalid oCache.` );
+			throw new Error( `Clusterize.checkChanges.invalid.oCache` );
 		}
 
 		//	...
-		let bChanged = ( value !== oCache[ sType ] );
-		oCache[ sType ] = value;
+		let bChanged = ( vValue !== this.oCache[ sType ] );
+		this.oCache[ sType ] = vValue;
 
 		//	...
 		return bChanged;
 	}
 }
+
+
 
 
 /**
