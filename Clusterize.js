@@ -408,7 +408,7 @@ class Clusterize
 		}
 
 		//	...
-		let oTag	= document.createElement( this.options.tag );
+		let oTag = document.createElement( this.options.tag );
 		let sClusterizePrefix = 'clusterize-';
 
 		//	...
@@ -418,7 +418,6 @@ class Clusterize
 			oTag.style.height = String( nHeight ) + 'px';
 		}
 
-		//	...
 		return oTag.outerHTML;
 	}
 
@@ -442,8 +441,8 @@ class Clusterize
 
 		//	...
 		let oGeneratedData			= this.generate( this.getClusterNum() );
-		let this_cluster_rows			= oGeneratedData.rows.join( '' );
-		let this_cluster_content_changed	= this.checkChanges( 'data', this_cluster_rows );
+		let sThisClusterRowsString		= oGeneratedData.rows.join( '' );
+		let this_cluster_content_changed	= this.checkChanges( 'data', sThisClusterRowsString );
 		let top_offset_changed			= this.checkChanges( 'top', oGeneratedData.top_offset );
 		let only_bottom_offset_changed		= this.checkChanges( 'bottom', oGeneratedData.bottom_offset );
 		let callbacks				= this.options.callbacks;
@@ -457,7 +456,7 @@ class Clusterize
 				layout.push( this.renderExtraTag( 'top-space', oGeneratedData.top_offset ) );
 			}
 
-			layout.push( this_cluster_rows );
+			layout.push( sThisClusterRowsString );
 			oGeneratedData.bottom_offset && layout.push( this.renderExtraTag( 'bottom-space', oGeneratedData.bottom_offset ) );
 			callbacks.clusterWillChange && callbacks.clusterWillChange();
 			this.html( layout.join( '' ) );
